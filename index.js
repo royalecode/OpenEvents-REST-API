@@ -4,26 +4,26 @@ const express = require("express");
 const app = express();
 
 // ROUTES
-const authenticationRoute = require("./routes/authentication.route");
 const usersRoute = require("./routes/users.route");
-const videogamesRoute = require("./routes/videogames.route");
+const eventsRoute = require("./routes/events.route");
+const friendsRoute = require("./routes/friends.route");
+const messagesRoute = require("./routes/messages.route");
 
 // MIDDLEWARES
 const authenticate = require("./authentication");
 
+app.use(express.static("public"));
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
-//public
-app.use("/", authenticationRoute);
-app.use("/users", usersRoute);
+app.use("/api/users", usersRoute);
+app.use("/api/events", eventsRoute);
+app.use("/api/friends", friendsRoute);
+app.use("/api/messages", messagesRoute);
 
-//private
-app.use("/videogames", authenticate, videogamesRoute);
-
-//fallback public
-app.all("*", (req, res, next) => {
+//fallback
+app.all("/api/*", (req, res, next) => {
   console.log(req.url);
   next({
     status: 404,
@@ -32,7 +32,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  // console.log("error", err);
+  console.log("error", err);
   res.status(err.status).json(err);
 });
 
