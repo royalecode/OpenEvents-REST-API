@@ -10,17 +10,17 @@ const friendsRoute = require("./routes/friends.route");
 const messagesRoute = require("./routes/messages.route");
 
 // MIDDLEWARES
-const authenticate = require("./authentication");
+//const authenticate = require("./authentication");
 
-app.use(express.static("public"));
+//app.use(express.static("public"));
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
 app.use("/api/users", usersRoute);
-app.use("/api/events", eventsRoute);
-app.use("/api/friends", friendsRoute);
-app.use("/api/messages", messagesRoute);
+//app.use("/api/events", eventsRoute);
+//app.use("/api/friends", friendsRoute);
+//app.use("/api/messages", messagesRoute);
 
 //fallback
 app.all("/api/*", (req, res, next) => {
@@ -37,5 +37,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => {
-  console.log(`http://localhost:${port}`);
+  console.log(`http://localhost:${port}/api`);
 });
