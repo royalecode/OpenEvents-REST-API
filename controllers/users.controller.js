@@ -77,4 +77,55 @@ async function register(req, res, next) {
     });
 }
 
-module.exports = { login, register };
+async function getAllUsers(req, res, next){
+  
+  let query = `SELECT * FROM users`;
+  const [rows] = await conn.promise().query(query);
+
+  const result = rows.map((e) => {
+    delete e.password;
+    return e;
+  }).map(({id, name, last_name, image, email}) => ({id, name, last_name, image, email}));
+  
+  res.json(result);
+  res.status(200).end();
+}
+
+async function getUser(req, res, next){
+
+  let query = `SELECT * FROM users WHERE id = ?`;
+  const [rows] = await conn.promise().query(query, [req.params.id]);
+
+  const result = rows.map((e) => {
+    delete e.password;
+    return e;
+  }).map(({id, name, last_name, image, email}) => ({id, name, last_name, image, email}));
+  
+  res.json(result[0]);
+  res.status(200).end();
+}
+
+async function deleteUser(req, res, next) {
+  
+  let query = `DELETE FROM users WHERE id = ?`;
+  const [rows] = await conn.promise().query(query, [req.User.id]);
+  res.status(204).end();
+}
+
+async function search(req, res, next){
+  console.log(" hola");
+  console.log(req.query.s);
+  let s = req.query.s;
+  let query = `SELECT * FROM users WHERE name LIKE '%?%' OR last_name LIKE '%?%' OR email LIKE '%?%'`;
+  const [rows] = await conn.promise().query(query, [s, s, s]);
+
+  const result = rows.map((e) => {
+    delete e.password;
+    return e;
+  }).map(({id, name, last_name, image, email}) => ({id, name, last_name, image, email}));
+
+  res.json(result);
+  res.status(200).end();
+}
+
+module.exports = { login, register, getAllUsers, getUser, deleteUser, search };
