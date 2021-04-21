@@ -6,7 +6,7 @@ const app = express();
 // ROUTES
 const usersRoute = require("./routes/users.route");
 const eventsRoute = require("./routes/events.route");
-const friendsRoute = require("./routes/friends.route");
+//const friendsRoute = require("./routes/friends.route");
 const messagesRoute = require("./routes/messages.route");
 
 // MIDDLEWARES
