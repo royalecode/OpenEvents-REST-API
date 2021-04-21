@@ -8,7 +8,7 @@ async function getByEmail(email) {
   
 async function insert(user) {
     const [resultado] = await conn.promise().query("INSERT INTO users SET ?", [user]);
-  
+   
     user.id = resultado.insertId;
     delete user.password;
     return user;
@@ -41,8 +41,7 @@ async function login(req, res, next) {
           JSON.stringify(user),
           process.env.ACCESS_TOKEN_SECRET
         );
-        res.json({ accessToken });
-        res.status(200).end();
+        res.status(200).json({ accessToken });
       });
     } catch (error) {
       next({ status: 500, error: "Recurso no encontrado", stacktrace: error });
@@ -67,8 +66,7 @@ async function register(req, res, next) {
       req.body.password = hash;
       try {
         const response = await insert(req.body);
-        res.json(response);
-        res.status(201).end();
+        res.status(201).json(response);
       } catch (ex) {
         next({ status: 409, error: "Error when insert user", trace: ex });
       }
@@ -78,15 +76,20 @@ async function register(req, res, next) {
 async function getAllUsers(req, res, next){
   let query = `SELECT id, name, last_name, image, email FROM users`;
   const [rows] = await conn.promise().query(query);
-  res.json(rows);
-  res.status(200).end();
+  res.status(200).json(rows);
 }
 
 async function getUser(req, res, next){
   let query = `SELECT id, name, last_name, image, email FROM users WHERE id = ?`;
   const [rows] = await conn.promise().query(query, [req.params.id]);
-  res.json(rows[0]);
-  res.status(200).end();
+  if(rows.length === 0){
+    return next({
+      status: 404,
+      error: "El usuario no existe",
+      trace: "ex",
+    });
+  }
+  res.status(200).json(rows[0]);
 }
 
 async function deleteUser(req, res, next) {
@@ -138,8 +141,7 @@ async function updateUser(req, res, next) {
       delete user.password;
       const [userUpdated] = await conn.promise().query("SELECT id, name, last_name, image, email FROM users WHERE id = ?", [req.USER.id]);
       
-      res.json(userUpdated[0]);
-      res.status(200).end();
+      res.status(200).json(userUpdated[0]);
     } catch (ex) {
       next({ status: 409, error: "Error when insert user", trace: ex });
     }
@@ -150,32 +152,28 @@ async function events(req, res, next) {
   let id = req.params.id;
   let query = `SELECT * FROM events WHERE owner_id = ?`;
   const [rows] = await conn.promise().query(query, [id]);
-  res.json(rows);
-  res.status(200).end();
+  res.status(200).json(rows);
 }
 
 async function futureEvents(req, res, next) {
   let id = req.params.id;
   let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date > CURDATE()`;
   const [rows] = await conn.promise().query(query, [id]);
-  res.json(rows);
-  res.status(200).end();
+  res.status(200).json(rows);
 }
 
 async function finishedEvents(req, res, next) {
   let id = req.params.id;
   let query = `SELECT * FROM events WHERE owner_id = ? AND eventEnd_date < CURDATE()`;
   const [rows] = await conn.promise().query(query, [id]);
-  res.json(rows);
-  res.status(200).end();
+  res.status(200).json(rows);
 }
 
 async function currentEvents(req, res, next) {
   let id = req.params.id;
   let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date < CURDATE() AND eventEnd_date > CURDATE()`;
   const [rows] = await conn.promise().query(query, [id]);
-  res.json(rows);
-  res.status(200).end();
+  res.status(200).json(rows);
 }
 
 async function friends(req, res, next) {
@@ -185,9 +183,45 @@ async function friends(req, res, next) {
   let query2 = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id WHERE friend.status = 1 AND friend.user_id_friend = ?`;
   const [rows2] = await conn.promise().query(query2, [id]);
   rows.push(rows2);
-  res.json(rows);
-  res.status(200).end();
+  res.status(200).json(rows);
+}
+
+async function assistances(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ?`;
+  const [rows] = await conn.promise().query(query, [id]);
+  rows.map((item) => {
+    delete item.user_id;
+    delete item.event_id;
+    return item;
+  });
+  res.status(200).json(rows);
+}
+
+async function assistancesFuture(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ? AND e.eventStart_date > CURDATE()`;
+  const [rows] = await conn.promise().query(query, [id]);
+  rows.map((item) => {
+    delete item.user_id;
+    delete item.event_id;
+    return item;
+  });
+  res.status(200).json(rows);
+}
+
+async function assistancesFinished(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ? AND e.eventEnd_date < CURDATE()`;
+  const [rows] = await conn.promise().query(query, [id]);
+  rows.map((item) => {
+    delete item.user_id;
+    delete item.event_id;
+    return item;
+  });
+  res.status(200).json(rows);
 }
 
 module.exports = { login, register, getAllUsers, getUser, deleteUser, searchString, updateUser,
-   events, futureEvents, finishedEvents, currentEvents, friends };
+   events, futureEvents, finishedEvents, currentEvents, friends, assistances, assistancesFuture,
+    assistancesFinished };

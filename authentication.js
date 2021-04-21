@@ -10,7 +10,7 @@ function authenticate(req, res, next) {
     return next({
       status: "401",
       error: "No estas autenticado",
-      hint: "Has probado a hacer login? http://localhost:3000/login",
+      hint: "Has probado a hacer login? http://localhost:3000/api/users/login",
     });
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {

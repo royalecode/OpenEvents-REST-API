@@ -18,9 +18,9 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use("/api/users", usersRoute);
-//app.use("/api/events", eventsRoute);
+app.use("/api/events", eventsRoute);
 //app.use("/api/friends", friendsRoute);
-//app.use("/api/messages", messagesRoute);
+app.use("/api/messages", messagesRoute);
 
 //fallback
 app.all("/api/*", (req, res, next) => {

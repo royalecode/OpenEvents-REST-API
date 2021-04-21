@@ -20,10 +20,10 @@ router.get("/:id/events/future", controller.futureEvents);
 router.get("/:id/events/finished", controller.finishedEvents);
 router.get("/:id/events/current", controller.currentEvents);
 
-/*router.get("/:id/assistances", controller.assistances);
-router.get("/:id/assistances/future", controller.futureAssistances);
-router.get("/:id/assistances/finished", controller.finishedAssistances);
-*/
+router.get("/:id/assistances", controller.assistances);
+router.get("/:id/assistances/future", controller.assistancesFuture);
+router.get("/:id/assistances/finished", controller.assistancesFinished);
+
 router.get("/:id/friends", controller.friends);
 
 module.exports = router;
