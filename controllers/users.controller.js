@@ -7,9 +7,7 @@ async function getByEmail(email) {
 }
   
 async function insert(user) {
-    const [resultado] = await conn
-      .promise()
-      .query("INSERT INTO users SET ?", [user]);
+    const [resultado] = await conn.promise().query("INSERT INTO users SET ?", [user]);
   
     user.id = resultado.insertId;
     delete user.password;
@@ -78,30 +76,16 @@ async function register(req, res, next) {
 }
 
 async function getAllUsers(req, res, next){
-  
-  let query = `SELECT * FROM users`;
+  let query = `SELECT id, name, last_name, image, email FROM users`;
   const [rows] = await conn.promise().query(query);
-
-  const result = rows.map((e) => {
-    delete e.password;
-    return e;
-  }).map(({id, name, last_name, image, email}) => ({id, name, last_name, image, email}));
-  
-  res.json(result);
+  res.json(rows);
   res.status(200).end();
 }
 
 async function getUser(req, res, next){
-
-  let query = `SELECT * FROM users WHERE id = ?`;
+  let query = `SELECT id, name, last_name, image, email FROM users WHERE id = ?`;
   const [rows] = await conn.promise().query(query, [req.params.id]);
-
-  const result = rows.map((e) => {
-    delete e.password;
-    return e;
-  }).map(({id, name, last_name, image, email}) => ({id, name, last_name, image, email}));
-  
-  res.json(result[0]);
+  res.json(rows[0]);
   res.status(200).end();
 }
 
@@ -112,7 +96,7 @@ async function deleteUser(req, res, next) {
   res.status(204).end();
 }
 
-async function search(req, res, next){
+async function searchString(req, res, next){
   console.log(" hola");
   console.log(req.query.s);
   let s = req.query.s;
@@ -128,4 +112,82 @@ async function search(req, res, next){
   res.status(200).end();
 }
 
-module.exports = { login, register, getAllUsers, getUser, deleteUser, search };
+async function updateUser(req, res, next) {
+  const bcrypt = require("bcrypt");
+  const saltRounds = 10;
+  const myPlaintextPassword = req.body.password;
+  let user;
+
+  bcrypt.hash(myPlaintextPassword, saltRounds, async (err, hash) => {
+    if (err)
+      next({
+        status: 500,
+        error: "error al encriptar el password",
+        trace: err,
+      });
+    req.body.password = hash;
+    try {
+      user = {
+        name: req.body.name,
+        last_name: req.body.last_name,
+        email: req.body.email,
+        password: req.body.password
+      };
+
+      const [resultado] = await conn.promise().query("UPDATE users SET ? WHERE users.id = ? ", [user, req.USER.id]);
+      delete user.password;
+      const [userUpdated] = await conn.promise().query("SELECT id, name, last_name, image, email FROM users WHERE id = ?", [req.USER.id]);
+      
+      res.json(userUpdated[0]);
+      res.status(200).end();
+    } catch (ex) {
+      next({ status: 409, error: "Error when insert user", trace: ex });
+    }
+  });
+}
+
+async function events(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT * FROM events WHERE owner_id = ?`;
+  const [rows] = await conn.promise().query(query, [id]);
+  res.json(rows);
+  res.status(200).end();
+}
+
+async function futureEvents(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date > CURDATE()`;
+  const [rows] = await conn.promise().query(query, [id]);
+  res.json(rows);
+  res.status(200).end();
+}
+
+async function finishedEvents(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT * FROM events WHERE owner_id = ? AND eventEnd_date < CURDATE()`;
+  const [rows] = await conn.promise().query(query, [id]);
+  res.json(rows);
+  res.status(200).end();
+}
+
+async function currentEvents(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date < CURDATE() AND eventEnd_date > CURDATE()`;
+  const [rows] = await conn.promise().query(query, [id]);
+  res.json(rows);
+  res.status(200).end();
+}
+
+async function friends(req, res, next) {
+  let id = req.params.id;
+  let query = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id_friend WHERE friend.status = 1 AND friend.user_id = ?`;
+  const [rows] = await conn.promise().query(query, [id]);
+  let query2 = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id WHERE friend.status = 1 AND friend.user_id_friend = ?`;
+  const [rows2] = await conn.promise().query(query2, [id]);
+  rows.push(rows2);
+  res.json(rows);
+  res.status(200).end();
+}
+
+module.exports = { login, register, getAllUsers, getUser, deleteUser, searchString, updateUser,
+   events, futureEvents, finishedEvents, currentEvents, friends };
