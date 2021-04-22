@@ -99,7 +99,7 @@ async function deleteUser(req, res, next) {
   res.status(204).end();
 }
 
-async function searchString(req, res, next){
+async function search(req, res, next){
   console.log(" hola");
   console.log(req.query.s);
   let s = req.query.s;
@@ -222,6 +222,6 @@ async function assistancesFinished(req, res, next) {
   res.status(200).json(rows);
 }
 
-module.exports = { login, register, getAllUsers, getUser, deleteUser, searchString, updateUser,
+module.exports = { login, register, getAllUsers, getUser, deleteUser, search, updateUser,
    events, futureEvents, finishedEvents, currentEvents, friends, assistances, assistancesFuture,
     assistancesFinished };

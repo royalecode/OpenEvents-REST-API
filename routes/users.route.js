@@ -11,7 +11,7 @@ router.use(authenticate);
 //Private Endpoints
 router.get("/", controller.getAllUsers);
 router.get("/:id", controller.getUser);
-router.get("/search", controller.searchString);
+router.get("/search", controller.search);
 router.put("/", controller.updateUser);
 router.delete("/", controller.deleteUser);
 
