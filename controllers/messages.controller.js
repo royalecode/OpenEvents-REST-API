@@ -1,19 +1,31 @@
 const { connection: conn } = require("../database/connection");
 
 async function newMessage(req, res, next) {
+    const Joi = require('joi');
     try{
+        const data = req.body;
+        const schema = Joi.object().keys({
+            content: Joi.string().required(),
+            user_id_send: Joi.number().required(),
+            user_id_recived: Joi.number().required()
+        });
+        try {
+            const value = await schema.validateAsync(data);
+        }
+        catch (err) {  return next({ status: 400, error: "El body no es correcto", trace: err})}
+    
+        const message = {
+            content: req.body.content,
+            user_id_send: req.body.user_id_send,
+            user_id_recived: req.body.user_id_recived
+        }
+
         if(req.USER.id != req.body.user_id_send){
             return next({ 
                 status: 403, 
                 error: "No tienes permisos para enviar el mensaje", 
                 trace: "Unauthorized"
             });
-        }
-    
-        const message = {
-            content: req.body.content,
-            user_id_send: req.body.user_id_send,
-            user_id_recived: req.body.user_id_recived
         }
 
         try{

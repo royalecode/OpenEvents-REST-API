@@ -16,6 +16,20 @@ async function insert(user) {
   
 async function login(req, res, next) {
     const bcrypt = require("bcrypt");
+    const Joi = require('joi');
+
+    const data = req.body;
+    const schema = Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().min(7).required(),
+    });
+    try {
+      const value = await schema.validateAsync(data);
+    }
+    catch (err) { 
+      return next({ status: 400, error: "El body no es correcto", trace: err})
+    }
+
     try {
       let user;
       try {
@@ -50,6 +64,22 @@ async function login(req, res, next) {
   
 async function register(req, res, next) {
     const bcrypt = require("bcrypt");
+    const Joi = require('joi');
+
+    const data = req.body;
+    const schema = Joi.object().keys({
+      name: Joi.string().required(),
+      last_name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      password: Joi.string().min(7).required()
+    });
+    try {
+      const value = await schema.validateAsync(data);
+    }
+    catch (err) { 
+      return next({ status: 400, error: "El body no es correcto", trace: err})
+    }
+
     const saltRounds = 10;
     const myPlaintextPassword = req.body.password;
   
@@ -74,49 +104,82 @@ async function register(req, res, next) {
 }
 
 async function getAllUsers(req, res, next){
-  let query = `SELECT id, name, last_name, image, email FROM users`;
-  const [rows] = await conn.promise().query(query);
-  res.status(200).json(rows);
+  try {
+    let query = `SELECT id, name, last_name, image, email FROM users`;
+    const [rows] = await conn.promise().query(query);
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function getUser(req, res, next){
-  let query = `SELECT id, name, last_name, image, email FROM users WHERE id = ?`;
-  const [rows] = await conn.promise().query(query, [req.params.id]);
-  if(rows.length === 0){
-    return next({
-      status: 404,
-      error: "El usuario no existe",
-      trace: "ex",
-    });
+  try{
+    let query = `SELECT id, name, last_name, image, email FROM users WHERE id = ?`;
+    const [rows] = await conn.promise().query(query, [req.params.id]);
+    if(rows.length === 0){
+      return next({
+        status: 404,
+        error: "El usuario no existe",
+        trace: "ex",
+      });
+    }
+    res.status(200).json(rows[0]);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
   }
-  res.status(200).json(rows[0]);
 }
 
 async function deleteUser(req, res, next) {
-  
-  let query = `DELETE FROM users WHERE id = ?`;
-  const [rows] = await conn.promise().query(query, [req.User.id]);
-  res.status(204).end();
+  try{
+    let query = `DELETE FROM users WHERE id = ?`;
+    const [rows] = await conn.promise().query(query, [req.User.id]);
+    res.status(204).end();
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
-async function search(req, res, next){
-  console.log(" hola");
-  console.log(req.query.s);
-  let s = req.query.s;
-  let query = `SELECT * FROM users WHERE name LIKE '%?%' OR last_name LIKE '%?%' OR email LIKE '%?%'`;
-  const [rows] = await conn.promise().query(query, [s, s, s]);
+async function cerca(req, res, next){
+  try{
+    let s = req.query.s;
+    console.log(s);
+    if(s){
+      let query = `SELECT * FROM users WHERE name LIKE '%?%' OR last_name LIKE '%?%' OR email LIKE '%?%'`;
+      const [rows] = await conn.promise().query(query, [s, s, s]);
 
-  const result = rows.map((e) => {
-    delete e.password;
-    return e;
-  }).map(({id, name, last_name, image, email}) => ({id, name, last_name, image, email}));
+      const result = rows.map((e) => {
+        delete e.password;
+        return e;
+      }).map(({id, name, last_name, image, email}) => ({id, name, last_name, image, email}));
 
-  res.json(result);
-  res.status(200).end();
+      res.status(200).json(result);
+    }else{
+      return next({status: 400, error: "Querystring not found", trace: "Querystring" })
+    }
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function updateUser(req, res, next) {
   const bcrypt = require("bcrypt");
+  const Joi = require('joi');
+
+  const data = req.body;
+  const schema = Joi.object().keys({
+    name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(7).required()
+  });
+  try {
+      const value = await schema.validateAsync(data);
+  }
+  catch (err) { 
+      return next({ status: 400, error: "El body no es correcto", trace: err})
+  }
+
   const saltRounds = 10;
   const myPlaintextPassword = req.body.password;
   let user;
@@ -149,79 +212,111 @@ async function updateUser(req, res, next) {
 }
 
 async function events(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT * FROM events WHERE owner_id = ?`;
-  const [rows] = await conn.promise().query(query, [id]);
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT * FROM events WHERE owner_id = ?`;
+    const [rows] = await conn.promise().query(query, [id]);
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function futureEvents(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date > CURDATE()`;
-  const [rows] = await conn.promise().query(query, [id]);
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date > CURDATE()`;
+    const [rows] = await conn.promise().query(query, [id]);
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function finishedEvents(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT * FROM events WHERE owner_id = ? AND eventEnd_date < CURDATE()`;
-  const [rows] = await conn.promise().query(query, [id]);
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT * FROM events WHERE owner_id = ? AND eventEnd_date < CURDATE()`;
+    const [rows] = await conn.promise().query(query, [id]);
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function currentEvents(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date < CURDATE() AND eventEnd_date > CURDATE()`;
-  const [rows] = await conn.promise().query(query, [id]);
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT * FROM events WHERE owner_id = ? AND eventStart_date < CURDATE() AND eventEnd_date > CURDATE()`;
+    const [rows] = await conn.promise().query(query, [id]);
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function friends(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id_friend WHERE friend.status = 1 AND friend.user_id = ?`;
-  const [rows] = await conn.promise().query(query, [id]);
-  let query2 = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id WHERE friend.status = 1 AND friend.user_id_friend = ?`;
-  const [rows2] = await conn.promise().query(query2, [id]);
-  rows.push(rows2);
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id_friend WHERE friend.status = 1 AND friend.user_id = ?`;
+    const [rows] = await conn.promise().query(query, [id]);
+    let query2 = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id WHERE friend.status = 1 AND friend.user_id_friend = ?`;
+    const [rows2] = await conn.promise().query(query2, [id]);
+    rows.push(...rows2);
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function assistances(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ?`;
-  const [rows] = await conn.promise().query(query, [id]);
-  rows.map((item) => {
-    delete item.user_id;
-    delete item.event_id;
-    return item;
-  });
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ?`;
+    const [rows] = await conn.promise().query(query, [id]);
+    rows.map((item) => {
+      delete item.user_id;
+      delete item.event_id;
+      return item;
+    });
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function assistancesFuture(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ? AND e.eventStart_date > CURDATE()`;
-  const [rows] = await conn.promise().query(query, [id]);
-  rows.map((item) => {
-    delete item.user_id;
-    delete item.event_id;
-    return item;
-  });
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ? AND e.eventStart_date > CURDATE()`;
+    const [rows] = await conn.promise().query(query, [id]);
+    rows.map((item) => {
+      delete item.user_id;
+      delete item.event_id;
+      return item;
+    });
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
 async function assistancesFinished(req, res, next) {
-  let id = req.params.id;
-  let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ? AND e.eventEnd_date < CURDATE()`;
-  const [rows] = await conn.promise().query(query, [id]);
-  rows.map((item) => {
-    delete item.user_id;
-    delete item.event_id;
-    return item;
-  });
-  res.status(200).json(rows);
+  try{
+    let id = req.params.id;
+    let query = `SELECT * FROM events as e INNER JOIN assistance as a ON e.id = a.event_id WHERE a.user_id = ? AND e.eventEnd_date < CURDATE()`;
+    const [rows] = await conn.promise().query(query, [id]);
+    rows.map((item) => {
+      delete item.user_id;
+      delete item.event_id;
+      return item;
+    });
+    res.status(200).json(rows);
+  } catch (ex) {
+    return next({ status: 500, error: "Error en el servidor", trace: ex});
+  }
 }
 
-module.exports = { login, register, getAllUsers, getUser, deleteUser, search, updateUser,
+module.exports = { login, register, getAllUsers, getUser, deleteUser, cerca, updateUser,
    events, futureEvents, finishedEvents, currentEvents, friends, assistances, assistancesFuture,
     assistancesFinished };
