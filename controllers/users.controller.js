@@ -143,10 +143,11 @@ async function deleteUser(req, res, next) {
 async function cerca(req, res, next){
   try{
     let s = req.query.s;
-    console.log(s);
-    if(s){
-      let query = `SELECT * FROM users WHERE name LIKE '%?%' OR last_name LIKE '%?%' OR email LIKE '%?%'`;
-      const [rows] = await conn.promise().query(query, [s, s, s]);
+    const param = `%${s}%`;
+    console.log(param);
+    if(param){
+      let query = `SELECT * FROM users WHERE name LIKE ? OR last_name LIKE ? OR email LIKE ?`;
+      const [rows] = await conn.promise().query(query, [param, param, param]);
 
       const result = rows.map((e) => {
         delete e.password;
