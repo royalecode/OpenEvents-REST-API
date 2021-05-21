@@ -175,7 +175,7 @@ async function createEvent(req, res, next) {
         let obj = {
             name: req.body.name, 
             owner_id: req.USER.id,
-            create_date: new Date(),
+            date: new Date(),
             location: req.body.location,
             description: req.body.description,
             eventStart_date: req.body.eventStart_date,

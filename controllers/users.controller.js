@@ -65,7 +65,7 @@ async function login(req, res, next) {
 async function register(req, res, next) {
     const bcrypt = require("bcrypt");
     const Joi = require('joi');
-
+    
     const data = req.body;
     const schema = Joi.object().keys({
       name: Joi.string().required(),
@@ -259,9 +259,9 @@ async function currentEvents(req, res, next) {
 async function friends(req, res, next) {
   try{
     let id = req.params.id;
-    let query = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id_friend WHERE friend.status = 1 AND friend.user_id = ?`;
+    let query = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friends ON u.id = friends.user_id_friend WHERE friends.status = 1 AND friends.user_id = ?`;
     const [rows] = await conn.promise().query(query, [id]);
-    let query2 = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friend ON u.id = friend.user_id WHERE friend.status = 1 AND friend.user_id_friend = ?`;
+    let query2 = `SELECT u.id, u.name, u.last_name, u.image, u.email FROM users as u INNER JOIN friends ON u.id = friends.user_id WHERE friends.status = 1 AND friends.user_id_friend = ?`;
     const [rows2] = await conn.promise().query(query2, [id]);
     rows.push(...rows2);
     res.status(200).json(rows);
