@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"jonh@doe.com\",\r\n    \"password\": \"i<3cats\"\r\n}",
+							"raw": "{\r\n    \"email\": \"jonh.doe@doe.com\",\r\n    \"password\": \"i<3cats\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -44,7 +44,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\" : \"John\",\r\n    \"last_name\" : \"Doe\",\r\n    \"email\" : \"jonh@doe.com\",\r\n    \"password\" : \"i<3cats\"\r\n}\r\n",
+							"raw": "{\r\n    \"name\" : \"Edmon\",\r\n    \"last_name\" : \"Bosch\",\r\n    \"email\" : \"edmonbosch@gmail.com\",\r\n    \"password\" : \"lasallebcn\"\r\n}\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -112,7 +112,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/users/2",
+							"raw": "localhost:3000/api/users/27",
 							"host": [
 								"localhost"
 							],
@@ -120,7 +120,7 @@
 							"path": [
 								"api",
 								"users",
-								"2"
+								"27"
 							]
 						}
 					},
@@ -128,6 +128,9 @@
 				},
 				{
 					"name": "/users/search/john",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -141,8 +144,19 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "hola",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
 						"url": {
-							"raw": "localhost:3000/api/users/search?s=john",
+							"raw": "localhost:3000/api/users/search?s=ed",
 							"host": [
 								"localhost"
 							],
@@ -155,7 +169,7 @@
 							"query": [
 								{
 									"key": "s",
-									"value": "john"
+									"value": "ed"
 								}
 							]
 						}
@@ -179,7 +193,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\" : \"John\",\r\n    \"last_name\" : \"Doe\",\r\n    \"email\" : \"jonh.doe@doe.com\",\r\n    \"password\" : \"i<3cats\"\r\n}",
+							"raw": "{\r\n    \"name\" : \"Edmon\",\r\n    \"last_name\" : \"Bosch\",\r\n    \"email\" : \"edmon.2000@hotmail.es\",\r\n    \"password\" : \"lasallebcn\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -375,7 +389,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/users/2/assistances",
+							"raw": "localhost:3000/api/users/5/assistances",
 							"host": [
 								"localhost"
 							],
@@ -383,7 +397,7 @@
 							"path": [
 								"api",
 								"users",
-								"2",
+								"5",
 								"assistances"
 							]
 						}
@@ -465,7 +479,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/events/3",
+							"raw": "localhost:3000/api/events/30",
 							"host": [
 								"localhost"
 							],
@@ -473,7 +487,7 @@
 							"path": [
 								"api",
 								"events",
-								"3"
+								"30"
 							]
 						}
 					},
@@ -515,7 +529,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/events/20",
+							"raw": "localhost:3000/api/events/30",
 							"host": [
 								"localhost"
 							],
@@ -523,7 +537,7 @@
 							"path": [
 								"api",
 								"events",
-								"20"
+								"30"
 							]
 						}
 					},
@@ -608,7 +622,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/events/17/assitances",
+							"raw": "localhost:3000/api/events/3/assistances",
 							"host": [
 								"localhost"
 							],
@@ -616,8 +630,8 @@
 							"path": [
 								"api",
 								"events",
-								"17",
-								"assitances"
+								"3",
+								"assistances"
 							]
 						}
 					},
@@ -640,7 +654,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"puntuation\": 3,\r\n    \"comentary\": \"Meh\"\r\n}",
+							"raw": "{\r\n    \"puntuation\": 5,\r\n    \"comentary\": \"Meholo\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -648,7 +662,7 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/events/15/assistances",
+							"raw": "localhost:3000/api/events/3/assistances",
 							"host": [
 								"localhost"
 							],
@@ -656,7 +670,7 @@
 							"path": [
 								"api",
 								"events",
-								"15",
+								"3",
 								"assistances"
 							]
 						}
@@ -680,7 +694,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"puntuation\": 4,\r\n    \"comentary\": \"Yeah!\"\r\n}",
+							"raw": "{\r\n    \"puntuation\": 2,\r\n    \"comentary\": \"Yeah!\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -688,7 +702,7 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/events/15/assistances",
+							"raw": "localhost:3000/api/events/3/assistances",
 							"host": [
 								"localhost"
 							],
@@ -696,7 +710,7 @@
 							"path": [
 								"api",
 								"events",
-								"15",
+								"3",
 								"assistances"
 							]
 						}
@@ -720,7 +734,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Drawing Bears\",\r\n    \"location\": \"Barcelona\",\r\n    \"description\": \"Description\",\r\n    \"eventStart_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"eventEnd_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"n_participators\": 3,\r\n    \"type\": \"Education\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Beer University\",\r\n    \"location\": \"Barcelona\",\r\n    \"description\": \"Free covid\",\r\n    \"eventStart_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"eventEnd_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"n_participators\": 300,\r\n    \"type\": \"Music\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -758,7 +772,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Drawing Bears\",\r\n    // (opcional) \"image\": FILE,\r\n    \"location\": \"Madrid\",\r\n    \"description\": \"Description\",\r\n    \"eventStart_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"eventEnd_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"n_participators\": 3,\r\n    \"type\": \"Education\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Beer University\",\r\n    \"location\": \"Barcelona\",\r\n    \"description\": \"Description\",\r\n    \"eventStart_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"eventEnd_date\": \"2021-01-01T23:00:00.000Z\",\r\n    \"n_participators\": 15,\r\n    \"type\": \"Education\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -766,7 +780,7 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:3000/api/events/3",
+							"raw": "localhost:3000/api/events/31",
 							"host": [
 								"localhost"
 							],
@@ -774,7 +788,7 @@
 							"path": [
 								"api",
 								"events",
-								"3"
+								"31"
 							]
 						}
 					},
@@ -860,7 +874,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/friends/22",
+							"raw": "localhost:3000/api/friends/16",
 							"host": [
 								"localhost"
 							],
@@ -868,7 +882,7 @@
 							"path": [
 								"api",
 								"friends",
-								"22"
+								"16"
 							]
 						}
 					},
@@ -890,7 +904,7 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/friends/5",
+							"raw": "localhost:3000/api/friends/12",
 							"host": [
 								"localhost"
 							],
@@ -898,7 +912,7 @@
 							"path": [
 								"api",
 								"friends",
-								"5"
+								"12"
 							]
 						}
 					},
@@ -956,7 +970,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"content\": \"Hi!\",\r\n    \"user_id_send\" : 1,\r\n    \"user_id_recived\" : 27\r\n}",
+							"raw": "{\r\n    \"content\": \"hia again final test\",\r\n    \"user_id_send\" : 27,\r\n    \"user_id_recived\" : 15\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1023,7 +1037,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/api/messages/1",
+							"raw": "localhost:3000/api/messages/15",
 							"host": [
 								"localhost"
 							],
@@ -1031,7 +1045,7 @@
 							"path": [
 								"api",
 								"messages",
-								"1"
+								"15"
 							]
 						}
 					},
