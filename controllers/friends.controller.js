@@ -67,12 +67,12 @@ async function declineRequest(req, res, next) {
     try{
         let id = req.params.id;
     
-        let query = `DELETE FROM friends WHERE friends.user_id = ? AND friends.user_id_friend = ?`;
-        const [rows] = await conn.promise().query(query, [id, req.USER.id]);
+        let query = `DELETE FROM friends WHERE (friends.user_id = ? AND friends.user_id_friend = ?) OR (friends.user_id = ? AND friends.user_id_friend = ? AND friends.status = 1)`;
+        const [rows] = await conn.promise().query(query, [id, req.USER.id, req.USER.id, id]);
         if(rows.affectedRows === 0){
             next({ status: 409, error: "Error when delete friendship", trace: rows });
         }
-        res.status(204);
+        res.status(204).end();
     } catch (ex) {
         next({ status: 500, error: "Error en el servidor", trace: ex });
     }

@@ -114,7 +114,7 @@ async function deleteAssistance(req, res, next) {
         let id = Number(req.params.id);
         let query = `DELETE FROM assistance WHERE assistance.user_id = ? AND assistance.event_id = ?`;
         const [rows] = await conn.promise().query(query, [req.USER.id, id]);
-        res.status(204);
+        res.status(204).end();
     } catch (ex) {
         return next({ status: 500, error: "Error en el servidor", trace: ex});
     }
@@ -223,7 +223,7 @@ async function updateEvent(req, res, next) {
         let id = req.params.id;
         let query = `SELECT owner_id FROM events WHERE id = ?`;
         const [rows] = await conn.promise().query(query, [id]);
-        if(rows[0].owner_id == req.USER.id){
+        if(rows[0].owner_id != req.USER.id){
             return next({
                 status: 403,
                 error: "No tienes permisos",
